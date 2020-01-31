@@ -16,8 +16,7 @@ class Core
   // 路由處理
   function Route()
   {
-    require_once(FRAME_PATH . 'route.php');
-    route();
+    require(APP_PATH . 'easymvc/Route.php');
   }
   // 檢測開發環境
   function setReporting()
@@ -62,12 +61,13 @@ class Core
       }
     }
   }
-  // 自動載入控制器和模型類 
+  // 自動載入
   static function loadClass($class)
   {
     $frameworks = APP_PATH . $class . '.php';
     $controllers = APP_PATH . 'application/controllers/' . $class . '.php';
     $models = APP_PATH . 'application/models/' . $class . '.php';
+    $modules = MODULES_PATH . $class . '.php';
     // echo $class;
     // echo "<br>";
     // echo $frameworks;
@@ -81,9 +81,12 @@ class Core
     } elseif (file_exists($models)) {
       //載入應用模型類
       include $models;
+    } elseif (file_exists($modules)) {
+      //載入模組
+      include $modules;
     } else {
       /* 錯誤程式碼 */
-      echo "controller not found";
+      echo "module not found";
       exit();
     }
   }

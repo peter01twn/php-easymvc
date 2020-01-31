@@ -4,6 +4,11 @@ function checkMethod($methods) {
   if ($methods === $_SERVER['REQUEST_METHOD']) {
     return true;
   } else {
-    return false;
+    $msg = [
+      'success' => false,
+      'msg' => 'method not allow'
+    ];
+    echo json_encode($msg);
+    exit();
   }
 }

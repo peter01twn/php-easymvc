@@ -2,27 +2,34 @@
 
 namespace easymvc\base;
 
-class Route
+class Router
 {
-  protected $_routerTree;
+  protected $_middle;
   function __construct()
   {
-    $this->_routerTree = [];
+    $this->_middle = [];
   }
-  function callFunc($param1, $param2 = [], $ary = [])
+  function callFunc($funcAry)
   {
-    if (!isset($param1)) {
+    if (!isset($funcAry[0])) {
       return;
     }
-    if (is_array($param2)) {
-      call_user_func_array($param1, $param2);
+    if (isset($funcAry[1])) {
+      if (isset($funcAry[2])) {
+        $param = is_array($funcAry[2]) ? $funcAry[2] : [$funcAry[2]];
+        $class = new $funcAry[0];
+        call_user_func_array(array($class, $funcAry[1]), $param);
+      } else {
+        $param = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
+        call_user_func_array($funcAry[0], $param);
+      }
     } else {
-      call_user_func_array(array($param1, $param2), $ary = []);
+      $funcAry[0]();
     }
   }
-  function setTree($tree)
+  function setMiddle($middle)
   {
-    $this->_routerTree = $tree;
+    $this->_middle = $middle;
     return $this;
   }
   function run()
@@ -41,9 +48,6 @@ class Route
       array_shift($urlArray);
       $queryString = empty($urlArray) ? array() : $urlArray;
     }
-    if (!isset($_SESSION['username'])) {
-      $controllerName = 'admin';
-    }
     // 資料為空的處理
     $queryString = empty($queryString) ? array() : $queryString;
     // 例項化控制器
@@ -51,6 +55,15 @@ class Route
     $dispatch = new $controller($controllerName, $action);
     // 如果控制器和動作存在，這呼叫並傳入URL引數
     if ((int) method_exists($controller, $action)) {
+      foreach ($this->_middle as $obj) {
+        $url = $obj['url'];
+        $middlewars = $obj['middlewars'];
+        if (in_array($controllerName, $url)) {
+          foreach ($middlewars as $funcAry) {
+            $this->callFunc($funcAry);
+          }
+        }
+      }
       call_user_func_array(array($dispatch, $action), $queryString);
     } else {
       exit($controller . "->" . $action . " doesn't exist");
@@ -62,11 +75,3 @@ class Route
     }
   }
 }
-$middlewar = [
-  'middlewar' => [
-    ['checkSession'],
-    ['transform', 'move', ['temp', 'images']]
-  ],
-  'url' => ['products', 'events']
-];
-echo $_routerTree['middlewar']('name/', '2');
