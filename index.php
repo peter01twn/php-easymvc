@@ -7,9 +7,6 @@ define('APP_DEBUG', true);
 define('APP_URL', 'http://localhost/framework');
 define('VIEW_PATH', __DIR__ . '/application/views/');
 define('STATIC_PATH', __DIR__ . '/static/');
+define('MODULES_PATH', __DIR__ . '/modules/');
 // 載入框架
 require './easymvc/easyMVC.php';
-// $URL='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-// echo $URL;
-// echo '<br>';
-// echo $_GET['url'];

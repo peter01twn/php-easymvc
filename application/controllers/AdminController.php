@@ -1,43 +1,35 @@
 <?php
+
 use easymvc\base\Controller;
 use application\models\AdminModel;
 
-class AdminController extends Controller {
+class AdminController extends Controller
+{
   protected $_model;
-  function __construct()
+  public function __construct($controller, $action)
   {
+    parent::__construct($controller, $action);
     $this->_model = new AdminModel();
   }
-  function login() {
+  function login()
+  {
+    $this->_errMsg['msg'] = 'please enter correct info';
     if (!isset($_POST['username']) || !isset($_POST['password'])) {
-      echo '請輸入正確資料';
+      echo json_encode($this->_errMsg);
       exit();
     }
     $username = $this->_model->login($_POST['username'], $_POST['password']);
     if ($username) {
       session_start();
-      $_SESSION['username'] = 'username';
-      header('Location: /admin/events.html');
+      $_SESSION['username'] = $username;
+      echo json_encode($this->_msg);
     } else {
-      $msg = [
-        'success' => false
-      ];
-      echo json_encode($msg);
+      echo json_encode($this->_errMsg);
     }
   }
-  function logout() {
-    session_start();
-    session_destroy();
-    header('Location: /admin/login.html');
-  }
-  function render()
+  function logout()
   {
-    session_start();
-    if (!isset($_SESSION['username'])) {
-      header('Location: /admin/login.html');
-    } else {
-      header('Location: /admin/events.html');
-    }
-    exit();
+    session_destroy();
+    echo json_encode($this->_msg);
   }
 };

@@ -16,7 +16,7 @@ class Core
   // 路由處理
   function Route()
   {
-    require_once(FRAME_PATH . 'Route.php');
+    require_once(FRAME_PATH . 'route.php');
     route();
   }
   // 檢測開發環境
