@@ -9,36 +9,24 @@ class Router
   {
     $this->_middle = [];
   }
-  function callFunc($funcAry)
-  {
-    if (!isset($funcAry[0])) {
-      return;
-    }
-    if (isset($funcAry[1])) {
-      if (isset($funcAry[2])) {
-        $param = is_array($funcAry[2]) ? $funcAry[2] : [$funcAry[2]];
-        $class = new $funcAry[0];
-        call_user_func_array(array($class, $funcAry[1]), $param);
-      } else {
-        $param = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
-        call_user_func_array($funcAry[0], $param);
+
+  protected function middleHandler($controllerName) {
+    foreach ($this->_middle as $obj) {
+      $url = $obj['url'];
+      $middlewars = $obj['middlewars'];
+      if (in_array($controllerName, $url)) {
+        foreach ($middlewars as $funcAry) {
+          $param2 = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
+          call_user_func_array($funcAry[0], $param2);
+        }
       }
-    } else {
-      $funcAry[0]();
     }
   }
-  function setMiddle($middle)
-  {
-    $this->_middle = $middle;
-    return $this;
-  }
-  function run()
-  {
-    session_start();
+
+  protected function parseUrl($url) {
     $controllerName = '';
     $action = '';
-    if (!empty($_GET['url'])) {
-      $url = $_GET['url'];
+    if (!empty($url)) {
       $urlArray = explode('/', $url);
       $controllerName = ucfirst($urlArray[0]);
       // 獲取動作名
@@ -50,20 +38,46 @@ class Router
     }
     // 資料為空的處理
     $queryString = empty($queryString) ? array() : $queryString;
+    return [$controllerName, $action, $queryString];
+  }
+
+  function setMiddle($middle)
+  {
+    $this->_middle = $middle;
+    return $this;
+  }
+
+  function run()
+  {
+    session_start();
+    $url = isset($_GET['url']) ? $_GET['url'] : '';
+    if (preg_match('/^static/', $url)) {
+      if (file_exists($url)) {
+        $ext = pathinfo($url, PATHINFO_EXTENSION);
+        header('X-Sendfile:' . APP_PATH . $url);
+        header("Content-Type: image/$ext");
+      } else {
+        echo 'file not found';
+      }
+      exit();
+    }
+    $parseAry = $this->parseUrl($url);
+    $controllerName = $parseAry[0];
+    $action = $parseAry[1];
+    $queryString = $parseAry[2];
+
+    $this->middleHandler($controllerName);
+
     // 例項化控制器
     $controller = $controllerName . 'Controller';
-    $dispatch = new $controller($controllerName, $action);
-    // 如果控制器和動作存在，這呼叫並傳入URL引數
+    try {
+      $dispatch = new $controller($controllerName, $action);
+    } catch (\Throwable $th) {
+      echo 'controller not found';
+      exit();
+    }
+    // 如果控制器和動作存在，呼叫並傳入URL引數
     if ((int) method_exists($controller, $action)) {
-      foreach ($this->_middle as $obj) {
-        $url = $obj['url'];
-        $middlewars = $obj['middlewars'];
-        if (in_array($controllerName, $url)) {
-          foreach ($middlewars as $funcAry) {
-            $this->callFunc($funcAry);
-          }
-        }
-      }
       call_user_func_array(array($dispatch, $action), $queryString);
     } else {
       exit($controller . "->" . $action . " doesn't exist");

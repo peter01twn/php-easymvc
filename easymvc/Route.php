@@ -7,7 +7,7 @@ $middlewar = [
   [
     'middlewars' => [
       ['checkMethod', 'get'],
-      ['checkSession']
+      ['checkSession', '']
     ],
     'url' => ['Events']
   ]

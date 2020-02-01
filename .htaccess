@@ -2,8 +2,6 @@
   Options -Indexes
   RewriteEngine On
   RewriteBase /
-  RewriteCond %{REQUEST_FILENAME} !-f [NC]
-  RewriteCond %{REQUEST_FILENAME} !-d [NC]
   RewriteRule ^(.*)$ index.php?url=$1 [END]
   RewriteCond %{HTTP_HOST} localhost/*$
   RewriteRule ^(.*)$ index.php [END]
