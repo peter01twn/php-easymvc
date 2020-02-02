@@ -2,14 +2,15 @@
 
 namespace application\models;
 
-class UploadModel
+class imgHandler
 {
   protected $tempPath;
   function __construct()
   {
     $this->tempPath = STATIC_PATH . 'temp/';
+    $this->storePath = STATIC_PATH . 'images/';
   }
-  function temp($fileName, $stmt)
+  function uploadTemp($fileName, $stmt)
   {
     $ext = pathinfo($fileName, PATHINFO_EXTENSION);
     $newName = uniqid() . '.' . $ext;

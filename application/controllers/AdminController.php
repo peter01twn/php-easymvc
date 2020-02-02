@@ -18,10 +18,10 @@ class AdminController extends Controller
       echo json_encode($this->_errMsg);
       exit();
     }
-    $username = $this->_model->login($_POST['username'], $_POST['password']);
-    if ($username) {
-      session_start();
-      $_SESSION['username'] = $username;
+    $account = $this->_model->login($_POST['username'], $_POST['password']);
+    if ($account) {
+      $_SESSION['username'] = $account['username'];
+      $_SESSION['cid'] = $account['id'];
       echo json_encode($this->_msg);
     } else {
       echo json_encode($this->_errMsg);
