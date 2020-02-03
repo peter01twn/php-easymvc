@@ -15,9 +15,13 @@ class Router
       $url = $obj['url'];
       $middlewars = $obj['middlewars'];
       if (in_array($controllerName, $url)) {
-        foreach ($middlewars as $funcAry) {
-          $param2 = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
-          call_user_func_array($funcAry[0], $param2);
+        foreach ($middlewars as $func) {
+          if (is_array($func) && isset($func[0]) && isset($func[1])) {
+            $func[1] = is_array($func[1]) ? $func[1] : [$func[1]];
+            call_user_func_array($func[0], $func[1]);
+          } else {
+            call_user_func_array($func, []);
+          }
         }
       }
     }
@@ -69,18 +73,22 @@ class Router
     $this->middleHandler($controllerName);
 
     // 例項化控制器
-    $controller = $controllerName . 'Controller';
+    $c = $controllerName . 'Controller';
+    $m = $controllerName . 'Model';
+
     try {
-      $dispatch = new $controller($controllerName, $action);
+      $model = new $m($controllerName);
+      $controller = new $c($controllerName, $action, $model);
     } catch (\Throwable $th) {
-      echo 'controller not found';
+      // echo $controllerName . ' not found';
+      echo $th;
       exit();
     }
     // 如果控制器和動作存在，呼叫並傳入URL引數
-    if ((int) method_exists($controller, $action)) {
-      call_user_func_array(array($dispatch, $action), $queryString);
+    if ((int) method_exists($c, $action)) {
+      call_user_func_array(array($controller, $action), $queryString);
     } else {
-      exit($controller . "->" . $action . " doesn't exist");
+      exit($c . "->" . $action . " doesn't exist");
       // $msg = [
       //   'success' => false,
       //   'code' => '404'

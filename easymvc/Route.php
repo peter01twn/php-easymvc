@@ -6,8 +6,7 @@ $route = new Router();
 $middlewar = [
   [
     'middlewars' => [
-      ['checkMethod', 'get'],
-      ['checkSession', '']
+      'checkSession'
     ],
     'url' => ['Events']
   ]

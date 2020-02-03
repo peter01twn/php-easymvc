@@ -1,15 +1,14 @@
 <?php
 
-use application\models\EventsModel;
 use easymvc\base\Controller;
 
 class EventsController extends Controller
 {
   public function get()
   {
-    $model = new EventsModel();
-    $data = $model->get();
-    echo $data;
+    $data = $this->_model->get();
+    $this->_msg['data'] = $data;
+    echo $this->msgJson();
   }
   public function post()
   {
@@ -21,34 +20,32 @@ class EventsController extends Controller
       ];
     }
     $insert_values = [
-      'cid' => $_SESSION['cid'],
+      'cid' => isset($_SESSION['cid']) ? $_SESSION['cid'] : 1,
       'title' => isset($_POST['title']) ? $_POST['title'] : '',
       'content' => isset($_POST['content']) ? $_POST['content'] : '',
       'location' => isset($_POST['location']) ? $_POST['location'] : '',
       'date' => isset($_POST['date']) ? $_POST['date'] : '',
       'banner' => $banner
     ];
-    $model = new EventsModel();
-    if ($model->post($insert_values)) {
-      echo json_encode($this->msg);
+    if ($this->_model->post($insert_values)) {
+      echo $this->msgJson();
     } else {
-      echo json_encode($this->errMsg);
+      echo $this->errMsgJson();
     }
   }
   public function delete()
   {
     $req = json_decode(file_get_contents('php://input'));
     $deleteId = is_array($req) ? $req : [$req];
-    $model = new EventsModel();
-    if ($model->delete($deleteId)) {
-      echo json_encode($this->msg);
+    if ($this->_model->delete($deleteId)) {
+      echo $this->msgJson();
     }
   }
   public function put()
   {
     if (!isset($_POST['id'])) {
       $this->errMsg['msg'] = 'id not set';
-      echo json_encode($this->errMsg);
+      echo $this->errMsgJson();
     }
     $banner = '';
     $insert_values = [
@@ -65,11 +62,10 @@ class EventsController extends Controller
       ];
       $insert_values['banner'] = $banner;
     }
-    $model = new EventsModel();
-    if ($model->put($insert_values)) {
-      echo json_encode($this->msg);
+    if ($this->_model->put($insert_values)) {
+      echo $this->msgJson();
     } else {
-      echo json_encode($this->errMsg);
+      echo $this->errMsgJson();
     }
   }
 }

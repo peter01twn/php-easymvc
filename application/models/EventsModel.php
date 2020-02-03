@@ -1,30 +1,21 @@
 <?php
 
-namespace application\models;
+// namespace application\models;
 
 use easymvc\base\Model;
 
 include MODULES_PATH . 'matchPaths.php';
 
-define('IMAGES_PATH', STATIC_PATH . 'events/images');
-define('TEMP_PATH', STATIC_PATH . 'events/temp');
-
 class EventsModel extends Model
 {
-  public function __construct()
-  {
-    parent::__construct();
-    $this->_table = 'events';
-  }
-
   protected function moveImages($str)
   {
-    $imgPaths = matchPaths($_POST['content']);
+    $imgPaths = matchPaths($str);
     foreach ($imgPaths as $path) {
       $basename = basename($path);
       if (file_exists(TEMP_PATH . $basename)) {
         rename(TEMP_PATH . $basename, IMAGES_PATH . $basename);
-        $str = str_replace($path, IMAGES_PATH . $basename, $str);
+        $str = str_replace($path, 'api.com/static/events/images/' . $basename, $str);
       }
     }
     return $str;
@@ -34,7 +25,7 @@ class EventsModel extends Model
   {
     $query = "SELECT `id`, `title`, `status`, `date`, `location` FROM {$this->_table}";
     $stmt = $this->_db->query($query);
-    return json_encode($stmt->fetchAll());
+    return $stmt->fetchAll();
   }
 
   function delete($id)
@@ -63,15 +54,16 @@ class EventsModel extends Model
     $values['content'] = $this->moveImages($values['content']);
     if (!empty($values['banner'])) {
       $ext = pathinfo($values['banner']['name'], PATHINFO_EXTENSION);
-      $name = uniqid() . '/' . $ext;
-      move_uploaded_file($values['banner']['tmp'] , $name);
-      $values['banner'] = $name;
+      $name = uniqid() . '.' . $ext;
+      move_uploaded_file($values['banner']['tmp'] , IMAGES_PATH . $name);
+      $values['banner'] = 'api.com/static/events/images/' . $name;
     }
     $valsAry = [];
     foreach ($values as $key => $val) {
       $valsAry[] = $val;
     }
-    $query_insert = "insert into `events` ('cid', 'title', 'content', 'location', 'date', 'banner') values (?, ?, ?, ?, ?, ?)";
+    $query_insert = "insert into `events` (`cid`, `title`, `content`, `location`, `date`, `banner`) values (?, ?, ?, ?, ?, ?)";
+
     $insert_stmt = $this->_db->prepare($query_insert);
     $insert_stmt->execute($valsAry);
     if ($insert_stmt->rowCount() > 0) {
@@ -94,26 +86,27 @@ class EventsModel extends Model
 
     foreach ($oldImgs as $val) {
       if (!in_array($val, $newImgs)) {
-        @unlink(IMAGES_PATH . basename($oldImgs));
+        @unlink(IMAGES_PATH . basename($val));
       }
     }
 
-    $query_update = "update `events` set 'title' = ?, 'content' = ?, 'location' = ?, 'date' = ? ";
+    $query_update = "update `events` set `title` = ?, `content` = ?, `location` = ?, `date` = ? ";
     $valsAry = [$values['title'], $values['content'], $values['location'], $values['date']];
     if (!empty($values['banner'])) {
       $ext = pathinfo($values['banner']['name'], PATHINFO_EXTENSION);
-      $name = uniqid() . '/' . $ext;
+      $name = uniqid() . '.' . $ext;
       move_uploaded_file($values['banner']['tmp'], IMAGES_PATH . $name);
-      @unlink(TEMP_PATH . basename($fetchData['banner']));
-      $query_update .= ", 'banner' = ? ";
-      $valsAry[] = IMAGES_PATH . $name;
+      @unlink(IMAGES_PATH . basename($fetchData['banner']));
+      $valsAry[] = 'api.com/static/events/images/' . $name;
+      $query_update .= ", `banner` = ? ";
     }
 
     $valsAry[] = $values['id'];
     $query_update .= "where `id` = ?";
-    $insert_stmt = $this->_db->prepare($query_update);
-    $insert_stmt->execute($valsAry);
-    if ($insert_stmt->rowCount() > 0) {
+    $update_stmt = $this->_db->prepare($query_update);
+    $update_stmt->execute($valsAry);
+    
+    if ($update_stmt->rowCount() > 0) {
       return true;
     } else {
       return false;

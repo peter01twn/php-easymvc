@@ -1,6 +1,6 @@
 <?php
 function checkSession() {
-  if (!isset($_SESSION['uername'])) {
+  if (!isset($_SESSION['username'])) {
     $msg = [
       'success' => false,
       'msg' => 'you are not login'

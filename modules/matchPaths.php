@@ -1,7 +1,4 @@
 <?php
-// matchImgUrl
-// @param  str: HTML-formate
-// @return array / imgURL
 function matchPaths($str)
 {
   $re = '/<img src="(.+)">/mU';

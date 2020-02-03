@@ -8,5 +8,7 @@ define('APP_URL', 'http://localhost/framework');
 define('VIEW_PATH', __DIR__ . '/application/views/');
 define('STATIC_PATH', __DIR__ . '/static/');
 define('MODULES_PATH', __DIR__ . '/modules/');
+define('IMAGES_PATH', STATIC_PATH . 'events/images/');
+define('TEMP_PATH', STATIC_PATH . 'events/temp/');
 // 載入框架
 require './easymvc/easyMVC.php';

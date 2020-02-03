@@ -70,8 +70,6 @@ class Core
     $modules = MODULES_PATH . $class . '.php';
     // echo $class;
     // echo "<br>";
-    // echo $frameworks;
-    // echo "<br>";
     if (file_exists($frameworks)) {
       // 載入框架核心類
       include $frameworks;
@@ -86,7 +84,8 @@ class Core
       include $modules;
     } else {
       /* 錯誤程式碼 */
-      echo "module not found";
+      echo "module not found : ";
+      echo $class;
       exit();
     }
   }
