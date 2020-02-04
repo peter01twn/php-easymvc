@@ -11,7 +11,7 @@ class UploadModel
     $newName = uniqid() . '.' . $ext;
     $newPath = TEMP_PATH . $newName;
     move_uploaded_file($stmt, $newPath);
-    $imgUrl = 'api.com/static/events/temp/' . $newName;
+    $imgUrl = 'api.com/public/events/temp/' . $newName;
     return $imgUrl;
   }
 }

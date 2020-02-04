@@ -1,14 +1,13 @@
 <?php
 // 應用目錄為當前目錄
-define('APP_PATH', __DIR__.'/');
+define('ROOT_PATH', __DIR__.'/');
 // 開啟除錯模式
 define('APP_DEBUG', true);
 // 網站根URL
-define('APP_URL', 'http://localhost/framework');
-define('VIEW_PATH', __DIR__ . '/application/views/');
-define('STATIC_PATH', __DIR__ . '/static/');
-define('MODULES_PATH', __DIR__ . '/modules/');
-define('IMAGES_PATH', STATIC_PATH . 'events/images/');
-define('TEMP_PATH', STATIC_PATH . 'events/temp/');
+define('ROOT_URL', 'http://api.com');
+define('PUBLIC_PATH', ROOT_PATH . 'public/');
+define('MODULES_PATH', ROOT_PATH . 'application/modules/');
+define('IMAGES_PATH', PUBLIC_PATH . 'events/images/');
+define('TEMP_PATH', PUBLIC_PATH . 'events/temp/');
 // 載入框架
 require './easymvc/easyMVC.php';

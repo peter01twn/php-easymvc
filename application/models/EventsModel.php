@@ -15,7 +15,7 @@ class EventsModel extends Model
       $basename = basename($path);
       if (file_exists(TEMP_PATH . $basename)) {
         rename(TEMP_PATH . $basename, IMAGES_PATH . $basename);
-        $str = str_replace($path, 'api.com/static/events/images/' . $basename, $str);
+        $str = str_replace($path, 'api.com/public/events/images/' . $basename, $str);
       }
     }
     return $str;
@@ -30,7 +30,7 @@ class EventsModel extends Model
 
   function delete($id)
   {
-    $query_getImg = "select `banner`, `content` from `events` where `id` = ?";
+    $query_getImg = "select `banner`, `content` from {$this->_table} where `id` = ?";
     $getImg_stmt = $this->_db->prepare($query_getImg);
     $getImg_stmt->execute($id);
     $fetchdata = $getImg_stmt->fetch();
@@ -42,7 +42,7 @@ class EventsModel extends Model
       @unlink($path);
     }
 
-    $query_del = 'DELETE FROM `events` WHERE `id` = ?';
+    $query_del = "DELETE FROM {$this->_table} WHERE `id` = ?";
     $del_stmt = $this->_db->prepare($query_del);
     $del_stmt->execute($id);
 
@@ -56,13 +56,13 @@ class EventsModel extends Model
       $ext = pathinfo($values['banner']['name'], PATHINFO_EXTENSION);
       $name = uniqid() . '.' . $ext;
       move_uploaded_file($values['banner']['tmp'] , IMAGES_PATH . $name);
-      $values['banner'] = 'api.com/static/events/images/' . $name;
+      $values['banner'] = 'api.com/public/events/images/' . $name;
     }
     $valsAry = [];
     foreach ($values as $key => $val) {
       $valsAry[] = $val;
     }
-    $query_insert = "insert into `events` (`cid`, `title`, `content`, `location`, `date`, `banner`) values (?, ?, ?, ?, ?, ?)";
+    $query_insert = "insert into {$this->_table} (`cid`, `title`, `content`, `location`, `date`, `banner`) values (?, ?, ?, ?, ?, ?)";
 
     $insert_stmt = $this->_db->prepare($query_insert);
     $insert_stmt->execute($valsAry);
@@ -78,7 +78,7 @@ class EventsModel extends Model
     $values['content'] = $this->moveImages($values['content']);
     $newImgs = matchPaths($values['content']);
 
-    $query_getImg = "select `banner`, `content` from `events` where `id` = ?";
+    $query_getImg = "select `banner`, `content` from {$this->_table} where `id` = ?";
     $getImg_stmt = $this->_db->prepare($query_getImg);
     $getImg_stmt->execute([$values['id']]);
     $fetchData = $getImg_stmt->fetch();
@@ -90,14 +90,14 @@ class EventsModel extends Model
       }
     }
 
-    $query_update = "update `events` set `title` = ?, `content` = ?, `location` = ?, `date` = ? ";
+    $query_update = "update {$this->_table} set `title` = ?, `content` = ?, `location` = ?, `date` = ? ";
     $valsAry = [$values['title'], $values['content'], $values['location'], $values['date']];
     if (!empty($values['banner'])) {
       $ext = pathinfo($values['banner']['name'], PATHINFO_EXTENSION);
       $name = uniqid() . '.' . $ext;
       move_uploaded_file($values['banner']['tmp'], IMAGES_PATH . $name);
       @unlink(IMAGES_PATH . basename($fetchData['banner']));
-      $valsAry[] = 'api.com/static/events/images/' . $name;
+      $valsAry[] = 'api.com/public/events/images/' . $name;
       $query_update .= ", `banner` = ? ";
     }
 

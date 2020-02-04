@@ -58,7 +58,7 @@ class Router
     if (preg_match('/^static/', $url)) {
       if (file_exists($url)) {
         $ext = pathinfo($url, PATHINFO_EXTENSION);
-        header('X-Sendfile:' . APP_PATH . $url);
+        header('X-Sendfile:' . ROOT_PATH . $url);
         header("Content-Type: image/$ext");
       } else {
         echo 'file not found';

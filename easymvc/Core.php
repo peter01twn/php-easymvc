@@ -16,7 +16,7 @@ class Core
   // 路由處理
   function Route()
   {
-    require(APP_PATH . 'easymvc/Route.php');
+    require(ROOT_PATH . 'easymvc/Route.php');
   }
   // 檢測開發環境
   function setReporting()
@@ -64,9 +64,9 @@ class Core
   // 自動載入
   static function loadClass($class)
   {
-    $frameworks = APP_PATH . $class . '.php';
-    $controllers = APP_PATH . 'application/controllers/' . $class . '.php';
-    $models = APP_PATH . 'application/models/' . $class . '.php';
+    $frameworks = ROOT_PATH . $class . '.php';
+    $controllers = ROOT_PATH . 'application/controllers/' . $class . '.php';
+    $models = ROOT_PATH . 'application/models/' . $class . '.php';
     $modules = MODULES_PATH . $class . '.php';
     // echo $class;
     // echo "<br>";

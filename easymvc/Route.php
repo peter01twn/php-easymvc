@@ -5,10 +5,10 @@ require(MODULES_PATH . 'checkSession.php');
 $route = new Router();
 $middlewar = [
   [
+    'url' => ['events'],
     'middlewars' => [
       'checkSession'
-    ],
-    'url' => ['Events']
+    ]
   ]
 ];
 $route->setMiddle($middlewar)->run();
