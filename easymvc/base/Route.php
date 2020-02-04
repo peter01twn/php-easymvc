@@ -15,13 +15,15 @@ class RouteNode
   protected $parent;
   protected $router;
 
-  function __constructor($uri, $controller = null, $action = null, $method = 'any')
+  function __construct($uri, $controller = null, $action = null, $method = 'any')
   {
     $this->method = $method;
     $this->uri = $uri;
     $this->controller = $controller;
     $this->action = $action;
     $this->params = [];
+    $this->children = [];
+    $this->middlewars = [];
   }
 
   function setParent($parent)
@@ -52,7 +54,7 @@ class RouteNode
     $newNode = new RouteNode($uri, $controller, $action, $method);
     $newNode
       ->setParent($parent);
-      // ->setRouter($parent->getRouter());
+    // ->setRouter($parent->getRouter());
     return $newNode;
   }
 
@@ -100,19 +102,21 @@ class RouteNode
     }
     $pathAry = array_filter(explode('/', $path));
     $uriAry = array_filter(explode('/', $this->uri));
-    while (count($uriAry)) {
-      if(preg_match('/:(\w*)$/', $uriAry[0])) {
-        $this->params[] = array_shift($pathAry[0]);
-        array_shift($uriAry[0]);
+    for ($i = 0; $i < count($uriAry); $i++) {
+      if (preg_match('/:(\w*)$/', $uriAry[0])) {
+        $this->params[] = array_shift($pathAry);
+        array_shift($uriAry);
         continue;
-      } else if (array_shift($str) === array_shift($uriAry[0])) {
+      } else if (array_shift($pathAry) === array_shift($uriAry)) {
         continue;
       } else {
         return;
       }
     }
+
     $this->run();
-    foreach ($this->children as $node) {
+    $children = empty($this->children) ? [] : $this->children;
+    foreach ($children as $node) {
       $node->runTree(implode('', $pathAry), $this->params);
     }
   }
@@ -120,6 +124,10 @@ class RouteNode
   function run()
   {
     $this->callMiddlewars();
+    $this->callController();
+  }
+  protected function callController()
+  {
     $controller = $this->controller;
     if ($controller) {
       $insController = new $controller();
@@ -127,7 +135,6 @@ class RouteNode
       exit();
     }
   }
-
   // function run($url)
   // {
   //   $uriCollection = $this->getAllUri();
@@ -154,7 +161,8 @@ class RouteNode
   protected function getAllUri()
   {
     $uriCollection = [];
-    foreach ($this->children as $child) {
+    $children = empty($this->children) ? [] : $this->children;
+    foreach ($children as $child) {
       $childCollection = $this->child->run();
       $childCollection = preg_replace('/(.*)/', $this->uri . '$1', $childCollection);
       $uriCollection[] = $childCollection;
@@ -188,7 +196,8 @@ class RouteNode
   // }
   protected function callMiddlewars()
   {
-    foreach ($this->middlewars as $funcAry) {
+    $middlewars = empty($this->middlewars) ? [] : $this->middlewars;
+    foreach ($middlewars as $funcAry) {
       if (is_array($funcAry[0])) {
         if (isset($funcAry[1])) {
           $funcAry[1] = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
@@ -200,13 +209,3 @@ class RouteNode
     }
   }
 }
-
-$root = new RouteNode('/');
-
-$root->setMiddlewar('gghjgh', 'fgh');
-$admin = $root->any('admin/')->setMiddlewar('kjl', 'hjkj');
-$admin->get('sadas');
-$admin->get('sadas');
-$admin->get('sadas');
-$root->any('user/');
-$root->any('public/');
