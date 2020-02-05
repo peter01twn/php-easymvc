@@ -1,9 +1,15 @@
 <?php
 
 use easymvc\base\Controller;
+use application\models\EventsModel;
 
 class EventsController extends Controller
 {
+  function __construct($controller, $action)
+  {
+    parent::__construct($controller, $action);
+    $this->_model = new EventsModel();
+  }
   public function get()
   {
     $data = $this->_model->get();

@@ -1,6 +1,6 @@
 <?php
 
-// namespace application\models;
+namespace application\models;
 
 class UploadModel
 {

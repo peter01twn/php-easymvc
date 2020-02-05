@@ -7,11 +7,10 @@ class Controller {
   protected $_model;
   protected $_msg;
   protected $_errMsg;
-  public function __construct($controller, $action, $model)
+  public function __construct($controller, $action)
   {
     $this->_controller = $controller;
     $this->_action = $action;
-    $this->_model = $model;
     $this->_msg = [
       'success' => true
     ];

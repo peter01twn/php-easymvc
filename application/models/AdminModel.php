@@ -1,9 +1,10 @@
 <?php
-// namespace application\models;
+namespace application\models;
 
 use easymvc\base\Model;
 
 class AdminModel extends Model {
+  protected $_table = 'admin';
   function login($username, $password) {
     // $password = sha1($password);
     $query = "SELECT `id`, `username` FROM {$this->_table} WHERE `username` = ? AND `password` = ?";

@@ -1,6 +1,6 @@
 <?php
 
-// namespace application\models;
+namespace application\models;
 
 use easymvc\base\Model;
 
@@ -8,6 +8,7 @@ include MODULES_PATH . 'matchPaths.php';
 
 class EventsModel extends Model
 {
+  protected $_table = 'events';
   protected function moveImages($str)
   {
     $imgPaths = matchPaths($str);

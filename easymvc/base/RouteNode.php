@@ -1,5 +1,4 @@
 <?php
-
 namespace easymvc\base;
 
 class RouteNode
@@ -60,28 +59,33 @@ class RouteNode
 
   function get($uri, $controller = null, $action = null)
   {
-    $this->children[] = $this->createRoute($uri, $controller, $action, 'get', $this);
-    return $this;
+    $newNode = $this->createRoute($uri, $controller, $action, 'get', $this);
+    $this->children[] = $newNode;
+    return $newNode;
   }
   function post($uri, $controller = null, $action = null)
   {
-    $this->children[] = $this->createRoute($uri, $controller, $action, 'post', $this);
-    return $this;
+    $newNode = $this->createRoute($uri, $controller, $action, 'post', $this);
+    $this->children[] = $newNode;
+    return $newNode;
   }
   function put($uri, $controller = null, $action = null)
   {
-    $this->children[] = $this->createRoute($uri, $controller, $action, 'put', $this);
-    return $this;
+    $newNode = $this->createRoute($uri, $controller, $action, 'put', $this);
+    $this->children[] = $newNode;
+    return $newNode;
   }
   function delete($uri, $controller = null, $action = null)
   {
-    $this->children[] = $this->createRoute($uri, $controller, $action, 'delete', $this);
-    return $this;
+    $newNode = $this->createRoute($uri, $controller, $action, 'delete', $this);
+    $this->children[] = $newNode;
+    return $newNode;
   }
   function any($uri, $controller = null, $action = null)
   {
-    $this->children[] = $this->createRoute($uri, $controller, $action, 'any', $this);
-    return $this;
+    $newNode = $this->createRoute($uri, $controller, $action, 'any', $this);
+    $this->children[] = $newNode;
+    return $newNode;
   }
 
   function getMiddlewaars()
@@ -89,7 +93,7 @@ class RouteNode
     return $this->middlewars;
   }
 
-  function setMiddlewar($param1, $param2)
+  function setMiddlewar($param1, $param2 = [])
   {
     $this->middlewars[] = [$param1, $param2];
     return $this;
@@ -97,9 +101,17 @@ class RouteNode
 
   function runTree($path, $params = [])
   {
+    
+    $method = strtoupper($this->method);
+    
+    if ($method !== 'ANY' && $method !== REQUEST_METHOD) {
+      return;
+    }
+    
     if (!empty($params)) {
       $this->params = array_merge($this->params, $params);
     }
+    
     $pathAry = array_filter(explode('/', $path));
     $uriAry = array_filter(explode('/', $this->uri));
     for ($i = 0; $i < count($uriAry); $i++) {
@@ -115,9 +127,9 @@ class RouteNode
     }
 
     $this->run();
-    $children = empty($this->children) ? [] : $this->children;
-    foreach ($children as $node) {
-      $node->runTree(implode('', $pathAry), $this->params);
+    $nextPath = implode('/', $pathAry);
+    foreach ($this->children as $node) {
+      $node->runTree($nextPath, $this->params);
     }
   }
 
@@ -130,32 +142,10 @@ class RouteNode
   {
     $controller = $this->controller;
     if ($controller) {
-      $insController = new $controller();
+      $insController = new $controller($controller, $this->action);
       call_user_func(array($insController, $this->action), $this->params);
       exit();
     }
-  }
-  // function run($url)
-  // {
-  //   $uriCollection = $this->getAllUri();
-  //   foreach ($uriCollection as $uri) {
-  //     $urlAry = explode('/', $url);
-  //     $uriAry = explode('/', $uri);
-  //     $hasParam = preg_match('/:(\w*)$/', $uri);
-  //     if ($hasParam) {
-  //       array_pop($uriAry);
-  //       $param = array_pop($urlAry);
-  //       // implode('', $uriAry);
-  //       // implode('', $urlAry);
-  //       if (implode('', $uriAry) === implode('', $urlAry)) {
-  //         # code...
-  //       }
-  //     }
-  //   }
-  // }
-
-  protected function matchUrl()
-  {
   }
 
   protected function getAllUri()
@@ -170,6 +160,12 @@ class RouteNode
     return empty($uriCollection) ? $this->uri : $uriCollection;
   }
 
+  protected function callMiddlewars()
+  {
+    foreach ($this->middlewars as $funcAry) {
+      call_user_func_array($funcAry[0], $funcAry[1]);
+    }
+  }
   // function setName($str) {
   //   $this->name = $str;
   //   return $this;
@@ -194,18 +190,5 @@ class RouteNode
   // function getName() {
   //   return $this->name;
   // }
-  protected function callMiddlewars()
-  {
-    $middlewars = empty($this->middlewars) ? [] : $this->middlewars;
-    foreach ($middlewars as $funcAry) {
-      if (is_array($funcAry[0])) {
-        if (isset($funcAry[1])) {
-          $funcAry[1] = is_array($funcAry[1]) ? $funcAry[1] : [$funcAry[1]];
-        }
-        call_user_func_array($funcAry[0], $funcAry[1]);
-      } else {
-        call_user_func_array($funcAry, []);
-      }
-    }
-  }
+
 }

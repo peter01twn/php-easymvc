@@ -1,4 +1,6 @@
 <?php
+use easymvc\base\RouteNode;
+
 /**
  * FastPHP核心框架
  */
@@ -7,6 +9,7 @@ class Core
   // 執行程式
   function run()
   {
+    session_start();
     spl_autoload_register(array($this, 'loadClass'));
     $this->setReporting();
     $this->removeMagicQuotes();
@@ -16,7 +19,16 @@ class Core
   // 路由處理
   function Route()
   {
-    require(ROOT_PATH . 'easymvc/Route.php');
+    require ROOT_PATH . '/application/modules/checkSession.php';
+    $root = new RouteNode('/');
+    $admin = $root->any('admin');
+    $admin->post('login', 'AdminController', 'login');
+    $admin->get('logout', 'AdminController', 'logout');
+    $check = $root->any('')->setMiddlewar('checkSession');
+    $events = $check->any('events');
+    $events->get('get', 'EventsController', 'get');
+
+    $root->runTree($_GET['url']);
   }
   // 檢測開發環境
   function setReporting()
@@ -85,7 +97,7 @@ class Core
     } else {
       /* 錯誤程式碼 */
       echo "module not found : ";
-      echo $class;
+      echo $frameworks;
       exit();
     }
   }

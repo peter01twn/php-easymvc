@@ -1,9 +1,15 @@
 <?php
 
 use easymvc\base\Controller;
+use application\models\AdminModel;
 
 class AdminController extends Controller
 {
+  function __construct($controller, $action)
+  {
+    parent::__construct($controller, $action);
+    $this->_model = new AdminModel();
+  }
   function login()
   {
     if (!isset($_POST['username']) || !isset($_POST['password'])) {
