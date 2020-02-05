@@ -6,9 +6,10 @@ use easymvc\base\Model;
 
 include MODULES_PATH . 'matchPaths.php';
 
-class EventsModel extends Model
+class AdminEventsModel extends Model
 {
   protected $_table = 'events';
+  protected $_imgUrl = PUBLIC_URL . 'events/images/';
   protected function moveImages($str)
   {
     $imgPaths = matchPaths($str);
@@ -16,7 +17,7 @@ class EventsModel extends Model
       $basename = basename($path);
       if (file_exists(TEMP_PATH . $basename)) {
         rename(TEMP_PATH . $basename, IMAGES_PATH . $basename);
-        $str = str_replace($path, 'api.com/public/events/images/' . $basename, $str);
+        $str = str_replace($path, $this->_imgUrl . $basename, $str);
       }
     }
     return $str;
@@ -24,16 +25,22 @@ class EventsModel extends Model
 
   function get()
   {
-    $query = "SELECT `id`, `title`, `status`, `date`, `location` FROM {$this->_table}";
+    $query = "SELECT `id`, `title`, `status`, `date`, `location`, `banner`, `content` FROM {$this->_table}";
     $stmt = $this->_db->query($query);
-    return $stmt->fetchAll();
+    $data = $stmt->fetchAll();
+    foreach ($data as &$row) {
+      $row['banner'] = $this->_imgUrl . $row['banner'];
+    }
+    return $data;
   }
 
   function delete($id)
   {
+    $deleteId = is_array($id) ? $id : [$id];
+
     $query_getImg = "select `banner`, `content` from {$this->_table} where `id` = ?";
     $getImg_stmt = $this->_db->prepare($query_getImg);
-    $getImg_stmt->execute($id);
+    $getImg_stmt->execute($deleteId);
     $fetchdata = $getImg_stmt->fetch();
     $imgPaths = matchPaths($fetchdata['content']);
     $imgPaths[] = $fetchdata['banner'];
@@ -42,10 +49,10 @@ class EventsModel extends Model
       $path = IMAGES_PATH . $fileName;
       @unlink($path);
     }
-
+    
     $query_del = "DELETE FROM {$this->_table} WHERE `id` = ?";
     $del_stmt = $this->_db->prepare($query_del);
-    $del_stmt->execute($id);
+    $del_stmt->execute($deleteId);
 
     return true;
   }
@@ -57,7 +64,7 @@ class EventsModel extends Model
       $ext = pathinfo($values['banner']['name'], PATHINFO_EXTENSION);
       $name = uniqid() . '.' . $ext;
       move_uploaded_file($values['banner']['tmp'] , IMAGES_PATH . $name);
-      $values['banner'] = 'api.com/public/events/images/' . $name;
+      $values['banner'] = $name;
     }
     $valsAry = [];
     foreach ($values as $key => $val) {
@@ -98,7 +105,7 @@ class EventsModel extends Model
       $name = uniqid() . '.' . $ext;
       move_uploaded_file($values['banner']['tmp'], IMAGES_PATH . $name);
       @unlink(IMAGES_PATH . basename($fetchData['banner']));
-      $valsAry[] = 'api.com/public/events/images/' . $name;
+      $valsAry[] = $name;
       $query_update .= ", `banner` = ? ";
     }
 

@@ -1,14 +1,14 @@
 <?php
 
 use easymvc\base\Controller;
-use application\models\EventsModel;
+use application\models\AdminEventsModel;
 
-class EventsController extends Controller
+class AdminEventsController extends Controller
 {
   function __construct($controller, $action)
   {
     parent::__construct($controller, $action);
-    $this->_model = new EventsModel();
+    $this->_model = new AdminEventsModel();
   }
   public function get()
   {
@@ -41,9 +41,8 @@ class EventsController extends Controller
   }
   public function delete()
   {
-    $req = json_decode(file_get_contents('php://input'));
-    $deleteId = is_array($req) ? $req : [$req];
-    if ($this->_model->delete($deleteId)) {
+    $id = json_decode(file_get_contents('php://input'));
+    if ($this->_model->delete($id)) {
       echo $this->msgJson();
     }
   }

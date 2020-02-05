@@ -4,7 +4,8 @@ define('ROOT_PATH', __DIR__.'/');
 // 開啟除錯模式
 define('APP_DEBUG', true);
 // 網站根URL
-define('ROOT_URL', 'http://api.com');
+define('ROOT_URL', 'http://api.com/');
+define('PUBLIC_URL', ROOT_URL . 'public/');
 define('PUBLIC_PATH', ROOT_PATH . 'public/');
 define('MODULES_PATH', ROOT_PATH . 'application/modules/');
 define('IMAGES_PATH', PUBLIC_PATH . 'events/images/');

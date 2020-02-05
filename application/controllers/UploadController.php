@@ -1,8 +1,13 @@
 <?php
 use easymvc\base\Controller;
-require_once(MODULES_PATH . 'checkMethod.php');
+use application\models\UploadModel;
 
 class UploadController extends Controller {
+  function __construct($controller, $action)
+  {
+    parent::__construct($controller, $action);
+    $this->_model = new UploadModel();
+  }
   function uploadTemp() {
     if ($_FILES['upload']['error'] === 0) {
       $fileName = $_FILES['upload']['name'];

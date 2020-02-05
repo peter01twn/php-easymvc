@@ -19,16 +19,7 @@ class Core
   // 路由處理
   function Route()
   {
-    require ROOT_PATH . '/application/modules/checkSession.php';
-    $root = new RouteNode('/');
-    $admin = $root->any('admin');
-    $admin->post('login', 'AdminController', 'login');
-    $admin->get('logout', 'AdminController', 'logout');
-    $check = $root->any('')->setMiddlewar('checkSession');
-    $events = $check->any('events');
-    $events->get('get', 'EventsController', 'get');
-
-    $root->runTree($_GET['url']);
+    require ROOT_PATH . 'easymvc/Router.php';
   }
   // 檢測開發環境
   function setReporting()
