@@ -88,6 +88,11 @@ class RouteNode
     return $newNode;
   }
 
+  function group($callback) {
+    $callback($this);
+    return $this;
+  }
+
   function getMiddlewaars()
   {
     return $this->middlewars;
