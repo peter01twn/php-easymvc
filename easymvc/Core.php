@@ -1,6 +1,4 @@
 <?php
-use easymvc\base\RouteNode;
-
 /**
  * FastPHP核心框架
  */

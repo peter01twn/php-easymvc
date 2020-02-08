@@ -8,6 +8,13 @@
 // $route = new route();
 // echo $route->uri;
 // $route::show();
-foreach ([] as $key) {
-  echo $key;
-}
+// if (false === '') {
+//   echo 'true';
+// } else {
+//   echo 'false';
+// }
+// foreach(['asd'] as $str) {
+//   echo $str;
+// }
+$str = ':path';
+echo preg_match('/:(\w*)$/', $str);

@@ -7,7 +7,7 @@ $root = new RouteNode('/');
 
 $admin = $root->any('admin');
 $admin
-  ->group(function($a) {
+  ->group(function(&$a) {
       $a->post('login', 'AdminController', 'login');
       $a->get('logout', 'AdminController', 'logout');
     })
@@ -15,8 +15,7 @@ $admin
     ->setMiddlewar('checkSession')
     ->group(function($a) {
         $a->post('upload', 'UploadController', 'uploadTemp');
-        $a
-          ->any('events')
+        $a->any('events')
             ->group(function($e) {
                 $e->get('get', 'AdminEventsController', 'get');
                 $e->post('post', 'AdminEventsController', 'post');
@@ -36,4 +35,4 @@ $admin
 // $events->post('put', 'AdminEventsController', 'put');
 // $events->delete('delete', 'AdminEventsController', 'delete');
 
-$root->runTree($_GET['url']);
+$root->run($_GET['url']);

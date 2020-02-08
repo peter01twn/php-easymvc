@@ -1,4 +1,5 @@
 <?php
+
 namespace easymvc\base;
 
 class RouteNode
@@ -51,9 +52,6 @@ class RouteNode
   protected function createRoute($uri, $controller, $action, $method, $parent)
   {
     $newNode = new RouteNode($uri, $controller, $action, $method);
-    $newNode
-      ->setParent($parent);
-    // ->setRouter($parent->getRouter());
     return $newNode;
   }
 
@@ -88,7 +86,8 @@ class RouteNode
     return $newNode;
   }
 
-  function group($callback) {
+  function group($callback)
+  {
     $callback($this);
     return $this;
   }
@@ -104,22 +103,29 @@ class RouteNode
     return $this;
   }
 
-  function runTree($path, $params = [])
+  function run($path, $params = [])
   {
-    
-    $method = strtoupper($this->method);
-    
-    if ($method !== 'ANY' && $method !== REQUEST_METHOD) {
-      return;
-    }
-    
+    if (!$this->checkMethod()) return;
     if (!empty($params)) {
       $this->params = array_merge($this->params, $params);
     }
-    
+    $nextPath = $this->parsePath($path);
+    if ($nextPath !== false) {
+      $this->callMiddlewars();
+      $this->callController();
+      foreach ($this->children as $node) {
+        $node->run($nextPath, $this->params);
+      }
+    } else {
+      return;
+    }
+  }
+  protected function parsePath($path)
+  {
     $pathAry = array_filter(explode('/', $path));
     $uriAry = array_filter(explode('/', $this->uri));
-    for ($i = 0; $i < count($uriAry); $i++) {
+    $n = count($uriAry);
+    for ($i = 0; $i < $n; $i++) {
       if (preg_match('/:(\w*)$/', $uriAry[0])) {
         $this->params[] = array_shift($pathAry);
         array_shift($uriAry);
@@ -127,50 +133,55 @@ class RouteNode
       } else if (array_shift($pathAry) === array_shift($uriAry)) {
         continue;
       } else {
-        return;
+        return false;
       }
     }
-
-    $this->run();
     $nextPath = implode('/', $pathAry);
-    foreach ($this->children as $node) {
-      $node->runTree($nextPath, $this->params);
-    }
+    return $nextPath;
   }
-
-  function run()
+  protected function checkMethod()
   {
-    $this->callMiddlewars();
-    $this->callController();
+    $method = strtoupper($this->method);
+    if ($method !== 'ANY' && $method !== REQUEST_METHOD) {
+      return false;
+    }
+    return true;
   }
+  // function run()
+  // {
+  //   $this->callMiddlewars();
+  //   $this->callController();
+  // }
   protected function callController()
   {
     $controller = $this->controller;
     if ($controller) {
-      $insController = new $controller($controller, $this->action);
+      $insController = new $controller();
+      print_r($this->params);
       call_user_func(array($insController, $this->action), $this->params);
       exit();
     }
   }
-
-  protected function getAllUri()
-  {
-    $uriCollection = [];
-    $children = empty($this->children) ? [] : $this->children;
-    foreach ($children as $child) {
-      $childCollection = $this->child->run();
-      $childCollection = preg_replace('/(.*)/', $this->uri . '$1', $childCollection);
-      $uriCollection[] = $childCollection;
-    }
-    return empty($uriCollection) ? $this->uri : $uriCollection;
-  }
-
   protected function callMiddlewars()
   {
     foreach ($this->middlewars as $funcAry) {
       call_user_func_array($funcAry[0], $funcAry[1]);
     }
   }
+
+  // protected function getAllUri()
+  // {
+  //   $uriCollection = [];
+  //   $children = empty($this->children) ? [] : $this->children;
+  //   foreach ($children as $child) {
+  //     $childCollection = $this->child->run();
+  //     $childCollection = preg_replace('/(.*)/', $this->uri . '$1', $childCollection);
+  //     $uriCollection[] = $childCollection;
+  //   }
+  //   return empty($uriCollection) ? $this->uri : $uriCollection;
+  // }
+
+
   // function setName($str) {
   //   $this->name = $str;
   //   return $this;

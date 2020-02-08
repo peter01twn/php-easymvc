@@ -1,7 +1,5 @@
 <?php
 
-namespace application\models;
-
 class UploadModel
 {
   protected $tempPath;
@@ -9,9 +7,9 @@ class UploadModel
   {
     $ext = pathinfo($fileName, PATHINFO_EXTENSION);
     $newName = uniqid() . '.' . $ext;
-    $newPath = TEMP_PATH . $newName;
+    $newPath = PUBLIC_PATH . 'events/temp/' . $newName;
     move_uploaded_file($stmt, $newPath);
-    $imgUrl = 'api.com/public/events/temp/' . $newName;
+    $imgUrl = PUBLIC_URL . 'events/temp/' . $newName;
     return $imgUrl;
   }
 }

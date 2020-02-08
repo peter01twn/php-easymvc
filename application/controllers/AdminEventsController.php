@@ -1,19 +1,13 @@
 <?php
 
 use easymvc\base\Controller;
-use application\models\AdminEventsModel;
 
 class AdminEventsController extends Controller
 {
-  function __construct($controller, $action)
-  {
-    parent::__construct($controller, $action);
-    $this->_model = new AdminEventsModel();
-  }
   public function get()
   {
-    $data = $this->_model->get();
-    $this->_msg['data'] = $data;
+    $data = $this->model->get();
+    $this->msg['data'] = $data;
     echo $this->msgJson();
   }
   public function post()
@@ -33,7 +27,7 @@ class AdminEventsController extends Controller
       'date' => isset($_POST['date']) ? $_POST['date'] : '',
       'banner' => $banner
     ];
-    if ($this->_model->post($insert_values)) {
+    if ($this->model->post($insert_values)) {
       echo $this->msgJson();
     } else {
       echo $this->errMsgJson();
@@ -42,7 +36,7 @@ class AdminEventsController extends Controller
   public function delete()
   {
     $id = json_decode(file_get_contents('php://input'));
-    if ($this->_model->delete($id)) {
+    if ($this->model->delete($id)) {
       echo $this->msgJson();
     }
   }
@@ -67,7 +61,7 @@ class AdminEventsController extends Controller
       ];
       $insert_values['banner'] = $banner;
     }
-    if ($this->_model->put($insert_values)) {
+    if ($this->model->put($insert_values)) {
       echo $this->msgJson();
     } else {
       echo $this->errMsgJson();

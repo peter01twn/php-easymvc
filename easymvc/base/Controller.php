@@ -2,26 +2,28 @@
 namespace easymvc\base;
 
 class Controller {
-  protected $_controller;
-  protected $_action;
-  protected $_model;
-  protected $_msg;
-  protected $_errMsg;
-  public function __construct($controller, $action)
+  protected $model;
+  protected $msg;
+  protected $errMsg;
+  public function __construct()
   {
-    $this->_controller = $controller;
-    $this->_action = $action;
-    $this->_msg = [
+    $class = get_class($this);
+    $modelName = substr($class, 0, -10) . 'Model';
+    if (file_exists(ROOT_PATH . 'application/models/' . $modelName . '.php')) {
+      echo $modelName;
+      $this->model = new $modelName();
+    }
+    $this->msg = [
       'success' => true
     ];
-    $this->_errMsg = [
+    $this->errMsg = [
       'success' => false
     ];
   }
   function msgJson() {
-    return json_encode($this->_msg);
+    return json_encode($this->msg);
   }
   function errMsgJson() {
-    return json_encode($this->_errMsg);
+    return json_encode($this->errMsg);
   }
 }

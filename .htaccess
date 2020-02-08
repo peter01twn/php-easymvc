@@ -2,7 +2,6 @@
   Options -Indexes
   RewriteEngine On
   RewriteBase /
+  RewriteCond %{REQUEST_URI} !^/public/
   RewriteRule ^(.*)$ index.php?url=$1 [END]
-  RewriteCond %{HTTP_HOST} localhost/*$
-  RewriteRule ^(.*)$ index.php [END]
 </IfModule>
