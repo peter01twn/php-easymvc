@@ -4,6 +4,7 @@ use easymvc\base\RouteNode;
 require MODULES_PATH . 'checkSession.php';
 
 $root = new RouteNode('/');
+$test = $root->any('test', 'TestController', 'getPage');
 
 $admin = $root->any('admin');
 $admin

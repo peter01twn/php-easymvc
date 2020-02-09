@@ -147,17 +147,11 @@ class RouteNode
     }
     return true;
   }
-  // function run()
-  // {
-  //   $this->callMiddlewars();
-  //   $this->callController();
-  // }
   protected function callController()
   {
     $controller = $this->controller;
     if ($controller) {
       $insController = new $controller();
-      print_r($this->params);
       call_user_func(array($insController, $this->action), $this->params);
       exit();
     }
