@@ -7,7 +7,7 @@ define('APP_DEBUG', true);
 define('ROOT_URL', 'http://api.com/');
 define('PUBLIC_URL', ROOT_URL . 'public/');
 define('PUBLIC_PATH', ROOT_PATH . 'public/');
-define('MODULES_PATH', ROOT_PATH . 'application/modules/');
+define('MODULES_PATH', ROOT_PATH . 'modules/');
 define('REQUEST_METHOD', $_SERVER[ 'REQUEST_METHOD' ]);
 // 載入框架
 require './easymvc/easyMVC.php';
