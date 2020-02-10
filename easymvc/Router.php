@@ -2,13 +2,15 @@
 use easymvc\base\RouteNode;
 
 require MODULES_PATH . 'checkSession.php';
+require ROOT_PATH . 'router/root.php';
+require ROOT_PATH . 'router/company.php';
 
-$root = new RouteNode('/');
+// $root = new RouteNode('/');
 $test = $root->any('test', 'TestController', 'getPage');
 
 $admin = $root->any('admin');
 $admin
-  ->group(function(&$a) {
+  ->group(function($a) {
       $a->post('login', 'AdminController', 'login');
       $a->get('logout', 'AdminController', 'logout');
     })
