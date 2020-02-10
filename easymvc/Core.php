@@ -35,7 +35,14 @@ class Core
   // 刪除敏感字元
   function stripSlashesDeep($value)
   {
-    $value = is_array($value) ? array_map('stripSlashesDeep', $value) : stripslashes($value);
+    // $value = is_array($value) ? array_map('stripSlashesDeep', $value) : stripslashes($value);
+    if (is_array($value)) {
+      foreach ($value as $val) {
+        stripslashes($val);
+      }
+    } else {
+      $value = stripslashes($val);
+    }
     return $value;
   }
   // 檢測敏感字元並刪除

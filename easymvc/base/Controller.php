@@ -10,7 +10,6 @@ class Controller {
     $class = get_class($this);
     $modelName = substr($class, 0, -10) . 'Model';
     if (file_exists(ROOT_PATH . 'application/models/' . $modelName . '.php')) {
-      echo $modelName;
       $this->model = new $modelName();
     }
     $this->msg = [
